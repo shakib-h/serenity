@@ -20,6 +20,8 @@ answer_choice = [
     ["Almost_Always"],
 ]
 
+print("hello")
+
 user_input = []
 ques = 0
 
