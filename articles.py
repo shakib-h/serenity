@@ -7,7 +7,7 @@ articles = [
     {"title": "Article 1", "link": "https://www.example.com/article1"},
     {"title": "Article 2", "link": "https://www.example.com/article2"},
     {"title": "Article 3", "link": "https://www.example.com/article3"},
-    {"title": "Article 4", "link": "https://www.example.com/article4"},
+   
 ]
 
 # Function to open a web page in the default browser
