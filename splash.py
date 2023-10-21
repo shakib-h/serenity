@@ -3,7 +3,7 @@ from tkinter import *
 from tkinter import font
 from PIL import ImageTk, Image
 import time
-import theme
+import helper
 
 
 class Splash:
@@ -23,15 +23,15 @@ class Splash:
     # w.configure(bg='#ED1B76')
     w.overrideredirect(1)  # for hiding titlebar
 
-    Frame(w, width=427, height=250, bg=theme.accentColor).place(x=0, y=0)
+    Frame(w, width=427, height=250, bg=helper.accentColor).place(x=0, y=0)
     label1 = Label(w, text='SERENITY', fg='white',
-                bg=theme.accentColor)  # decorate it
+                bg=helper.accentColor)  # decorate it
     # You need to install this font in your PC or try another one
     label1.configure(font=("Game Of Squids", 24, "bold"))
     label1.place(x=135, y=90)
 
     label2 = Label(w, text='Loading...', fg='white',
-                bg=theme.accentColor)  # decorate it
+                bg=helper.accentColor)  # decorate it
     label2.configure(font=("Calibri", 11))
     label2.place(x=10, y=215)
 

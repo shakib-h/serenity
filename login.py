@@ -1,10 +1,10 @@
-import sqlite3
 from tkinter import *
 from tkinter import messagebox
-import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
+import ttkbootstrap as ttk
 from PIL import Image, ImageTk  # Import PIL modules
-import theme
+import mysql.connector
+import helper
 
 # LOGIN CLASS
 class Login:
@@ -21,7 +21,7 @@ class Login:
         self.loginw.geometry("%dx%d+%d+%d" % (width, height, x, y))
         self.loginw.resizable(0, 0)
         self.loginw.protocol('WM_DELETE_WINDOW', self.__login_del__)
-        self.loginw.config(bg=theme.accentColor)
+        self.loginw.config(bg=helper.accentColor)
         
         # Load the background image
         background_image = Image.open("assets/background_image.jpg")
@@ -44,10 +44,10 @@ class Login:
 
     # LOGIN TABLE
     def logintable(self):
-        self.base = sqlite3.connect("assets/data.db")
+        self.base = mysql.connector.connect(**helper.db_config)
         self.cur = self.base.cursor()
         self.cur.execute(
-            "CREATE TABLE if not exists users ( username varchar (20),password	 varchar (20) NOT NULL,account_type varchar ( 10 ) NOT NULL,PRIMARY KEY(username));")
+            "CREATE TABLE IF NOT EXISTS users (username VARCHAR(20),password VARCHAR(20) NOT NULL,account_type VARCHAR(10) NOT NULL,PRIMARY KEY (username));")
 
     # WIDGET FUNCTION
     def obj(self):
@@ -74,7 +74,7 @@ class Login:
         s1 = self.password.get()
         s = s.upper()
         s1 = s1.upper()
-        self.cur.execute("select * from users where username=? and password=? ", (s, s1))
+        self.cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (s, s1))
         l = self.cur.fetchall()
         if (len(l) > 0):
             self.success()
@@ -112,7 +112,7 @@ class Login:
         s1 = self.password.get()
         s = s.upper()
         s1 = s1.upper()
-        self.cur.execute("select username from users where username = ?", (s,))
+        self.cur.execute("select username from users where username = %s", (s,))
         l = self.cur.fetchall()
         if (len(l) > 0):
             messagebox.showerror("Error", "Username already exists")
@@ -127,7 +127,7 @@ class Login:
             self.loginw.focus()
             return
         else:
-            self.cur.execute("insert into users values(?,?,?)", (s, s1, 'USER'))
+            self.cur.execute("insert into users values(%s,%s,%s)", (s, s1, 'USER'))
             messagebox.showinfo("Success", "User registered")
             self.base.commit()
             self.revert()
