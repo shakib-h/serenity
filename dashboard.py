@@ -7,7 +7,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import numpy as np
 
-
 import helper
 
 class Dashboard:
@@ -18,6 +17,7 @@ class Dashboard:
         # self.window.state('zoomed')
         self.window.resizable(0, 0)
         self.window.config(background='#eff5f6')
+        self.window.protocol("WM_DELETE_WINDOW", self.Exit)
         # window Icon
         icon = PhotoImage(file='assets/dashboard/pic-icon.png')
         self.window.iconphoto(True, icon)
@@ -57,7 +57,7 @@ class Dashboard:
         self.dashboard.place(x=35, y=289)
 
         self.dashboard_text = Button(self.sidebar, text='Dashboard', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                     cursor='hand2', activebackground='#ffffff')
+                                     cursor='hand2', activebackground='#ffffff', command=self.show_dashboard)
         self.dashboard_text.place(x=80, y=291)
 
         # Manage
@@ -68,7 +68,7 @@ class Dashboard:
         self.manage.place(x=35, y=340)
 
         self.manage_text = Button(self.sidebar, text='Manage', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                  cursor='hand2', activebackground='#ffffff')
+                                  cursor='hand2', activebackground='#ffffff', command=self.show_manage)
         self.manage_text.place(x=80, y=345)
 
         # Settings
@@ -79,7 +79,7 @@ class Dashboard:
         self.settings.place(x=35, y=402)
 
         self.settings_text = Button(self.sidebar, text='Settings', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                    cursor='hand2', activebackground='#ffffff')
+                                    cursor='hand2', activebackground='#ffffff', command=self.show_settings)
         self.settings_text.place(x=80, y=402)
 
         # Exit
@@ -90,16 +90,39 @@ class Dashboard:
         self.exit.place(x=25, y=452)
 
         self.exit_text = Button(self.sidebar, text='Exit', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                cursor='hand2', activebackground='#ffffff')
+                                cursor='hand2', activebackground='#ffffff', command=self.Exit)
         self.exit_text.place(x=85, y=462)
 
 
+        # ======= TIME AND DATE ============
+        self.clock_image = Image.open('assets/dashboard/time.png')
+        photo = ImageTk.PhotoImage(self.clock_image)
+        self.date_time_image = Label(self.sidebar, image=photo, bg='#ffffff')
+        self.date_time_image.image = photo
+        self.date_time_image.place(x=88, y=20)
 
+        self.date_time = Label(self.window)
+        self.date_time.place(x=115, y=15)
+        self.show_time()
+        self.current_frame = None
+        self.show_dashboard()
 
+    def show_dashboard(self):
+        if self.current_frame is not None:
+            self.current_frame.destroy()
+        self.current_frame = self.create_dashboard_frame()
 
-        # =====================================================================================
-        # ============================ BODY =================================================
-        # =====================================================================================
+    def show_manage(self):
+        if self.current_frame is not None:
+            self.current_frame.destroy()
+        self.current_frame = self.create_manage_frame()
+
+    def show_settings(self):
+        if self.current_frame is not None:
+            self.current_frame.destroy()
+        self.current_frame = self.create_settings_frame()
+
+    def create_dashboard_frame(self):
         self.heading = Label(self.window, text='Dashboard', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
         self.heading.place(x=325, y=70)
 
@@ -119,14 +142,6 @@ class Dashboard:
         self.bodyFrame4 = Frame(self.window, bg='#ffcb1f')
 
         self.bodyFrame4.place(x=1030, y=495, width=310, height=220)
-
-        # Pie Chart
-        #self.PieChartImage = Image.open('assets/dashboard/pie-graph1.png')
-        #photo = ImageTk.PhotoImage(self.PieChartImage)
-        #self.PieChart = Label(self.bodyFrame1, image=photo, bg='#ffffff')
-        #self.PieChart.image = photo
-        #self.PieChart.place(x=690, y=70)
-
 
         # Data Base
         data = pd.read_excel("assets/Book1.xlsx")
@@ -157,15 +172,6 @@ class Dashboard:
         canvasbar.draw()
         canvasbar.get_tk_widget().place(x=1120, y=285, anchor=CENTER)  # show the barchart on the ouput window
 
-
-
-        # Graph
-        #self.graphImage = Image.open('assets/dashboard/graph.png')
-        #photo = ImageTk.PhotoImage(self.graphImage)
-        #self.graph = Label(self.bodyFrame1, image=photo, bg='#ffffff')
-        #self.graph.image = photo
-        #self.graph.place(x=40, y=70)
-
         fig = plt.figure(figsize=(5, 3.5), dpi=100)
         labels = ('Julius', 'Gideons', 'Justice', 'Daniel', 'Simon', 'Dennis')
         labelpos = np.arange(len(labels))
@@ -186,18 +192,10 @@ class Dashboard:
             plt.text(x=index, y=datapoints + 0.3, s=f"{datapoints}", fontdict=dict(fontsize=10), ha='center',
                      va='bottom')
 
-
-
         ## This section draws a canvas to allow the barchart to appear in it
         canvasbar = FigureCanvasTkAgg(fig, master=self.window)
         canvasbar.draw()
         canvasbar.get_tk_widget().place(x=600, y=285, anchor=CENTER)  # show the barchart on the ouput window
-
-
-
-        self.window.protocol("WM_DELETE_WINDOW", self.Exit)
-
-
 
         # Total People
         self.totalPeopleImage = Image.open('assets/dashboard/left-icon.png')
@@ -238,17 +236,14 @@ class Dashboard:
         self.earn_figure = Label(self.bodyFrame4, text='$40,000.00', bg='#ffcb1f', font=("", 25, "bold"))
         self.earn_figure.place(x=80, y=100)
 
-        # ======= TIME AND DATE ============
-        self.clock_image = Image.open('assets/dashboard/time.png')
-        photo = ImageTk.PhotoImage(self.clock_image)
-        self.date_time_image = Label(self.sidebar, image=photo, bg='#ffffff')
-        self.date_time_image.image = photo
-        self.date_time_image.place(x=88, y=20)
+    def create_manage_frame(self):
+        self.heading = Label(self.window, text='Manage', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
+        self.heading.place(x=325, y=70)
 
-        self.date_time = Label(self.window)
-        self.date_time.place(x=115, y=15)
-        self.show_time()
-
+    def create_settings_frame(self):
+        self.heading = Label(self.window, text='Settings', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
+        self.heading.place(x=325, y=70)
+    
     def show_time(self):
         self.time = time.strftime("%H:%M:%S")
         self.date = time.strftime('%Y/%m/%d')
@@ -256,16 +251,8 @@ class Dashboard:
         self.date_time.configure(text=set_text, font=("", 13, "bold"), bd=0, bg="white", fg="black")
         self.date_time.after(100, self.show_time)
 
-
-
     def Exit(self):
         self.window.quit()
-
-
-
-
-
-
 
 def win():
     window = Tk()
