@@ -5,6 +5,7 @@ import ttkbootstrap as ttk
 from PIL import Image, ImageTk  # Import PIL modules
 import mysql.connector
 import helper
+from dashboard import Dashboard
 
 # LOGIN CLASS
 class Login:
@@ -12,13 +13,7 @@ class Login:
     def __init__(self):
         self.loginw = ttk.Window(themename="darkly")
         self.loginw.title("Serenity")
-        width = 1400
-        height = 780
-        screen_width = self.loginw.winfo_screenwidth()
-        screen_height = self.loginw.winfo_screenheight()
-        x = (screen_width / 2) - (width / 2)
-        y = (screen_height / 2) - (height / 2)
-        self.loginw.geometry("%dx%d+%d+%d" % (width, height, x, y))
+        self.loginw.geometry(helper.geometry)
         self.loginw.resizable(0, 0)
         self.loginw.protocol('WM_DELETE_WINDOW', self.__login_del__)
         self.loginw.config(bg=helper.accentColor)
@@ -28,7 +23,7 @@ class Login:
         self.background_photo = ImageTk.PhotoImage(background_image)
 
         # Create a canvas to display the background image
-        self.background_canvas = Canvas(self.loginw, width=width, height=height)
+        self.background_canvas = Canvas(self.loginw, width=helper.width, height=helper.height)
         self.background_canvas.create_image(0, 0, image=self.background_photo, anchor="nw")
         self.background_canvas.pack()
 
@@ -83,8 +78,8 @@ class Login:
 
     # LOGIN SUCCESS
     def success(self):
-        # messagebox.showinfo("Success","Login successful")
-        self.loginw.quit()
+        messagebox.showinfo("Success","Login successful")
+        self.loginw.destroy()
 
     # LOGIN FAILURE
     def fail(self):

@@ -9,3 +9,7 @@ db_config = {
 }
 
 api_key = "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"
+
+width = 1400
+height = 780
+geometry = f"{width}x{height}"
