@@ -1,104 +1,109 @@
 import tkinter as tk
 from tkinter import ttk
+import webbrowser
 from PIL import Image, ImageTk
 import requests
 from io import BytesIO
 
-# Create the main window
-window = tk.Tk()
-window.title("Modern Blog Page")
+# Create a list of blog links, titles, and image URLs
+blogs = [
+    {"title": "Blog 1", "link": "https://example.com/blog1", "image_url": "https://images.unsplash.com/photo-1614517453351-6c1522fc7a56?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
+    {"title": "Blog 1", "link": "https://example.com/blog1", "image_url": "https://images.unsplash.com/photo-1614517453351-6c1522fc7a56?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
+    {"title": "Blog 1", "link": "https://example.com/blog1", "image_url": "https://images.unsplash.com/photo-1614517453351-6c1522fc7a56?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
+    {"title": "Blog 1", "link": "https://example.com/blog1", "image_url": "https://images.unsplash.com/photo-1614517453351-6c1522fc7a56?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
+    {"title": "Blog 1", "link": "https://example.com/blog1", "image_url": "https://images.unsplash.com/photo-1614517453351-6c1522fc7a56?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
+    {"title": "Blog 1", "link": "https://example.com/blog1", "image_url": "https://images.unsplash.com/photo-1614517453351-6c1522fc7a56?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
+    {"title": "Blog 1", "link": "https://example.com/blog1", "image_url": "https://images.unsplash.com/photo-1614517453351-6c1522fc7a56?auto=format&fit=crop&q=80&w=2070&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"},
 
-# Define a modern font
-modern_font = ("Helvetica", 12)
-
-# Create a canvas for the entire page content
-canvas = tk.Canvas(window)
-canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-# Create a scrollbar for the canvas
-scrollbar = ttk.Scrollbar(window, orient=tk.VERTICAL, command=canvas.yview)
-scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
-canvas.config(yscrollcommand=scrollbar.set)
-
-# Create a frame inside the canvas for the articles
-content_frame = ttk.Frame(canvas)
-canvas.create_window((0, 0), window=content_frame, anchor="nw")
-
-# Sample blog content with online image URLs
-blog_content = [
-    {
-        "title": "First Post",
-        "content": "This is my first blog post. It's all about the beginning of my journey.",
-        "link": "https://www.example.com/post1",
-        "image_url": "https://images.unsplash.com/photo-1682687220866-c856f566f1bd?auto=format&fit=crop&q=80&w=2670&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8M",
-    },
-    {
-        "title": "Second Post",
-        "content": "Here's the second post on my blog. Learn about my latest adventures.",
-        "link": "https://www.example.com/post2",
-        "image_url": "https://images.unsplash.com/photo-1682687220866-c856f566f1bd?auto=format&fit=crop&q=80&w=2670&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8M",
-    },
-    {
-        "title": "Third Post",
-        "content": "And this is the third one. Discover exciting stories and more.",
-        "link": "https://www.example.com/post3",
-        "image_url": "https://images.unsplash.com/photo-1682687220866-c856f566f1bd?auto=format&fit=crop&q=80&w=2670&ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8M",
-    },
+    
 ]
 
-# Function to open the link
+# Function to open the selected link in a web browser
 def open_link(link):
-    import webbrowser
     webbrowser.open(link)
 
-# Function to handle the click event
-def handle_click(event, link):
-    open_link(link)
+# Function to download and display an image from a URL and resize it
+def load_image(image_url, width, height):
+    try:
+        response = requests.get(image_url)
+        img = Image.open(BytesIO(response.content))
+        img = img.resize((width, height), Image.LANCZOS)  # Resize the image
+        photo = ImageTk.PhotoImage(img)
+        return photo
+    except Exception as e:
+        print(f"Error loading image: {e}")
+        return None
 
-# Function to change cursor on hover
-def change_cursor(event):
-    event.widget.config(cursor="hand2")
+# Create the main window
+root = tk.Tk()
+root.title("Blog Page")
+root.state('zoomed') 
 
-# Function to display the online image with full width
-def display_image(image_url, frame):
-    response = requests.get(image_url)
-    img_data = BytesIO(response.content)
-    img = Image.open(img_data)
-    img = img.resize((600, 400), Image.LANCZOS)  # Set the size for full width
-    img = ImageTk.PhotoImage(img)
-    image_label = ttk.Label(frame, image=img)
-    image_label.image = img  # To prevent the image from being garbage collected
-    image_label.grid(row=0, column=0, padx=10, pady=10, columnspan=2, sticky="w")
+# Create a custom style for rounded rectangular labels
+style = ttk.Style()
+style.configure("RoundedRect.TLabel", borderwidth=1, relief="solid", padding=10, background="white", bordercolor="gray", borderradius=10)
 
-# Create labels and frames for the blog posts
-for i, post in enumerate(blog_content):
-    post_frame = ttk.Frame(content_frame, relief=tk.SOLID, borderwidth=2)
-    row, col = divmod(i, 2)  # Arrange two articles side by side
-    post_frame.grid(row=row, column=col, padx=10, pady=10, sticky="nsew")
+# Create a canvas with a vertical scrollbar
+canvas = tk.Canvas(root, borderwidth=0)
+vsb = tk.Scrollbar(root, orient="vertical", command=canvas.yview)
+canvas.configure(yscrollcommand=vsb.set)
 
-    # Display the online image with full width
-    display_image(post["image_url"], post_frame)
+canvas.pack(side="left", fill="both", expand=True)
+vsb.pack(side="right", fill="y")
 
-    post_title = ttk.Label(post_frame, text=post["title"], font=("Helvetica", 18, "bold"))
-    post_title.grid(row=1, column=0, padx=10, pady=10, sticky="w")
+frame = ttk.Frame(canvas)
+canvas.create_window((0, 0), window=frame, anchor="nw")
 
-    post_text = ttk.Label(post_frame, text=post["content"], font=modern_font, wraplength=600, justify="left")
-    post_text.grid(row=2, column=0, padx=10, pady=10, sticky="w")
+frame.bind("<Configure>", lambda event, canvas=canvas: canvas.configure(scrollregion=canvas.bbox("all")))
 
-    # Bind the click event to open the link
-    post_frame.bind("<Button-1>", lambda event, link=post["link"]: handle_click(event, link))
-    
-    # Change the cursor to a pointer on hover
-    post_frame.bind("<Enter>", change_cursor)
-    post_frame.bind("<Leave>", lambda event: event.widget.config(cursor=""))
+# Function to handle mouse wheel scrolling
+def on_mousewheel(event):
+    canvas.yview_scroll(-1 * (event.delta // 120), "units")
 
-    # Configure grid weights
-    post_frame.columnconfigure(0, weight=1)
-    post_frame.rowconfigure(2, weight=1)
+# Bind mouse wheel scrolling to the canvas
+canvas.bind_all("<MouseWheel>", on_mousewheel)
 
-# Update the canvas to fit the content
-content_frame.update_idletasks()
-canvas.config(scrollregion=canvas.bbox("all"))
+# Calculate the width of the link boxes based on the window size
+box_width = root.winfo_screenwidth() // 2  # Half the window width
+box_height = 500  # You can adjust this value as needed
 
-# Run the main loop
-window.mainloop()
+# Create two frames, one for each column
+frame1 = ttk.Frame(frame)
+frame2 = ttk.Frame(frame)
+frame1.grid(row=0, column=0, sticky="nsew")
+frame2.grid(row=0, column=1, sticky="nsew")
+
+# Create labels for each blog entry with images resized to the calculated box size
+for i, blog in enumerate(blogs):
+    title = blog["title"]
+    link = blog["link"]
+    image_url = blog["image_url"]
+
+    photo = load_image(image_url, box_width, box_height)
+    if photo:
+        if i % 2 == 0:
+            target_frame = frame1
+        else:
+            target_frame = frame2
+
+        label = ttk.Label(
+            target_frame,
+            text=title,
+            image=photo,
+            compound="top",
+            cursor="hand2",
+            style="RoundedRect.TLabel"
+        )
+        label.image = photo
+        label.grid(row=i // 2, padx=10, pady=10, sticky="nsew")
+
+        label.bind("<Button-1>", lambda event, link=link: open_link(link))
+
+# Configure row and column weights for grid resizing
+frame.grid_rowconfigure(0, weight=1)
+frame.grid_columnconfigure(0, weight=1)
+frame.grid_columnconfigure(1, weight=1)
+
+# Run the Tkinter main loop
+root.geometry("650x250")  # Set the window size
+root.mainloop()
