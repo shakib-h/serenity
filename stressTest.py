@@ -3,8 +3,8 @@ from tkinter import *
 
 stressTest = tk.Tk()
 stressTest.title("Stress Test")
-stressTest.geometry("500x500")
-stressTest.configure(bg="#ffffff")
+stressTest.geometry("600x600")
+stressTest.configure(bg="#325343")
 
 questions = [
     '''Q1 : How often do you feel overwhelmed with your life?''',
@@ -41,13 +41,14 @@ def selected():
     else:
         stress_level()
 
+
 def load_question():
     global ques
     question_text.set(questions[ques])
     for i in range(4):
         option_buttons[i].config(text=answer_choice[ques][i], state=NORMAL) # [MODIFIED] 'state=NORMAL' added [cause of non-error code now]
 
-def stress_level(): # [MODIFIED] numbers got modified 
+def stress_level(): # [MODIFIED] numbers got modified
     stress_mapping = {
         '0': 25,
         '1': 50,
@@ -61,15 +62,19 @@ def stress_level(): # [MODIFIED] numbers got modified
 
     for i, response in enumerate(user_input):
         stress_level += stress_mapping[str(response)] * (weights[i] / 100)
-
+    question_bg = Frame(height=420, width=580, bg="#a6de9b")
+    question_bg.pack()
     stress_result += str(stress_level)
-    stress = tk.Label(stressTest, text=stress_result, bg='#ffffff', fg='#111111', font=('Arial', 21))
+    stress = tk.Label(question_bg, text=stress_result, bg='#325343', fg='#a6de9b', font=('Arial', 21))
     stress.pack()
+
+
 
 def start():
     label.destroy()
     start_button.destroy()
-
+    question_bg = Frame(height=420, width=580, bg="#a6de9b")
+    question_bg.pack()
     global radiovar
     radiovar = IntVar()
     radiovar.set(-1)
@@ -82,25 +87,28 @@ def start():
     option_buttons = []
 
     global ques_label
-
-    ques_label = tk.Label(stressTest, textvariable=question_text, bg='#ffffff', fg='#111111', font=('Arial', 21))
+  
+    ques_label = tk.Label(question_bg, textvariable=question_text, bg='#a6de9b', fg='#325343', font=('Arial', 21))
     ques_label.pack()
-
+    
     # [MODIFIED] updated whole platform
     for i in range(4):
-        option = tk.Radiobutton(stressTest, text="", bg='#ffffff', fg='#111111', font=('Arial', 16), value=i, variable=radiovar, state=DISABLED)
+        option = tk.Radiobutton(question_bg, text="",  bg='#a6de9b', fg='#325343', font=('Arial', 16), value=i, variable=radiovar, state=DISABLED)
         option.pack()
         option_buttons.append(option)
 
     load_question()  # [MODIFIED] Added this line to load the first question
 
-    next_button = tk.Button(stressTest, text="Next", command=selected, bg='#ffffff', fg='#111111', font=('Arial', 20))
+    next_button = tk.Button(question_bg, text="Next", command=selected, bg='#325343', fg='#a6de9b', font=('Arial', 20))
     next_button.pack()
 
+
 # Widgets
-label = tk.Label(stressTest, text="Take a test to check your stress level")
-start_button = tk.Button(stressTest, text="Start test", bg='#333333', fg='#ffffff', command=start)
+label = tk.Label(stressTest, text="Take a test to check your stress level!",height=2, bg="#325343",font=("Impact", 20), fg="#a6de9b")
+start_button = tk.Button(stressTest,height=3,width=10, text="Start test", bg="#325343", fg='#ffffff',font=("Impact", 20), command=start)
 label.pack()
+
+
 start_button.pack()
 
 stressTest.mainloop()
