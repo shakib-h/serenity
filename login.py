@@ -1,7 +1,5 @@
 from tkinter import *
 from tkinter import messagebox
-from ttkbootstrap.constants import *
-import ttkbootstrap as ttk
 from PIL import Image, ImageTk  # Import PIL modules
 import mysql.connector
 import helper
@@ -11,7 +9,7 @@ from dashboard import Dashboard
 class Login:
 
     def __init__(self):
-        self.loginw = ttk.Window(themename="darkly")
+        self.loginw = Tk()
         self.loginw.title("Serenity")
         self.loginw.geometry(helper.geometry)
         self.loginw.resizable(0, 0)
@@ -46,21 +44,21 @@ class Login:
 
     # WIDGET FUNCTION
     def obj(self):
-        self.loginframe = ttk.Frame(self.background_canvas, height=400, width=300)  # Put the frame on the canvas
+        self.loginframe = Frame(self.background_canvas, height=400, width=300)  # Put the frame on the canvas
         self.loginw.bind('<Return>', self.checkuser)
         self.loginframe.place(x=1000, y=180)
         self.toplabel = Label(self.loginframe, fg="white", bg="#4267b2", anchor="center", text="Login",
                               font="Roboto 40 bold")
         self.toplabel.place(x=75, y=25)
-        self.us = ttk.Entry(self.loginframe, width=20, textvariable=self.username, font="Roboto 14 ")
+        self.us = Entry(self.loginframe, width=20, textvariable=self.username, font="Roboto 14 ")
         self.us.place(x=35, y=145, height=40)
-        self.pa = ttk.Entry(self.loginframe, width=20, textvariable=self.password, font="Roboto 14 ")
+        self.pa = Entry(self.loginframe, width=20, textvariable=self.password, font="Roboto 14 ")
         self.pa.place(x=35, y=195, height=40)
         self.us.bind('<Button-1>', self.onclick)
         self.pa.bind('<Button-1>', self.onclick1)
-        self.signin = ttk.Button(self.loginframe, width=20, text="Sign in", command=self.checkuser, bootstyle="SUCCESS")
+        self.signin = Button(self.loginframe, width=20, text="Sign in", command=self.checkuser)
         self.signin.place(x=30, y=280)
-        self.register = ttk.Button(self.loginframe, width=20, text="Register", command=self.reguser, bootstyle="INFO")
+        self.register = Button(self.loginframe, width=20, text="Register", command=self.reguser)
         self.register.place(x=30, y=325)
 
     # CHECK USER IN DATABASE
@@ -80,6 +78,10 @@ class Login:
     def success(self):
         messagebox.showinfo("Success","Login successful")
         self.loginw.destroy()
+        # window = Tk()
+        # Dashboard(window)
+        # window.mainloop()
+        Dashboard.win()
 
     # LOGIN FAILURE
     def fail(self):

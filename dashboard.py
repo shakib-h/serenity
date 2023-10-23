@@ -1,7 +1,6 @@
 from tkinter import *
+from tkinter import messagebox
 from PIL import ImageTk, Image
-from datetime import *
-import time
 import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
@@ -14,30 +13,39 @@ class Dashboard:
         self.window = window
         self.window.title('Dashboard - Serenity')
         self.window.geometry(helper.geometry)
-        # self.window.state('zoomed')
         self.window.resizable(0, 0)
         self.window.config(background='#eff5f6')
-        self.window.protocol("WM_DELETE_WINDOW", self.Exit)
-        # window Icon
         icon = PhotoImage(file='assets/dashboard/pic-icon.png')
         self.window.iconphoto(True, icon)
+        self.window.protocol('WM_DELETE_WINDOW', self.Exit)
 
-        # =====================================================================================
-        # ============================ HEADER =================================================
-        # =====================================================================================
+        self.current_frame = None  # To keep track of the current frame being displayed
+
+        # HEADER
         self.header = Frame(self.window, bg=helper.primaryColor)
         self.header.place(x=300, y=0, width=1070, height=60)
 
-        self.logout_text = Button(self.header, text='Logout', bg=helper.accentColor, font=("", 13, "bold"), bd=0, fg='white',
-                                  cursor='hand2', activebackground='#32cf8e')
-        self.logout_text.place(x=950, y=15)
+        self.headerText = Label(self.header, text="Dashboard", bg=helper.primaryColor, font=("", 20, "bold"))
+        self.headerText.place(x=5, y=12)
 
-        # =====================================================================================
-        # ============================ SIDEBAR =================================================
-        # =====================================================================================
+        self.logout_text = Button(self.header, text='Logout', bg=helper.accentColor, font=("", 13, "bold"), bd=0, fg='white',
+                                  cursor='hand2', activebackground='#32cf8e', command=self.Exit)
+        self.logout_text.place(x=980, y=15)
+
+        # SIDEBAR
         self.sidebar = Frame(self.window, bg='#ffffff')
         self.sidebar.place(x=0, y=0, width=300, height=768)
 
+        self.create_sidebar()
+
+        # BODY
+        self.body = Frame(self.window, bg='#eff5f6')
+        self.body.place(x=300, y=60, width=1040, height=655)
+
+        # Initialize with the Dashboard frame
+        self.show_dashboard()
+
+    def create_sidebar(self):
         # Logo
         self.logoImage = Image.open('assets/dashboard/hyy.png')
         photo = ImageTk.PhotoImage(self.logoImage)
@@ -60,16 +68,16 @@ class Dashboard:
                                      cursor='hand2', activebackground='#ffffff', command=self.show_dashboard)
         self.dashboard_text.place(x=80, y=291)
 
-        # Manage
-        self.manageImage = Image.open('assets/dashboard/manage-icon.png')
-        photo = ImageTk.PhotoImage(self.manageImage)
-        self.manage = Label(self.sidebar, image=photo, bg='#ffffff')
-        self.manage.image = photo
-        self.manage.place(x=35, y=340)
+        # Stress Test
+        self.stresstestImage = Image.open('assets/dashboard/manage-icon.png')
+        photo = ImageTk.PhotoImage(self.stresstestImage)
+        self.stresstest = Label(self.sidebar, image=photo, bg='#ffffff')
+        self.stresstest.image = photo
+        self.stresstest.place(x=35, y=340)
 
-        self.manage_text = Button(self.sidebar, text='Manage', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                  cursor='hand2', activebackground='#ffffff', command=self.show_manage)
-        self.manage_text.place(x=80, y=345)
+        self.stresstest_text = Button(self.sidebar, text='Stress Test', bg='#ffffff', font=("", 13, "bold"), bd=0,
+                                  cursor='hand2', activebackground='#ffffff', command=self.show_stresstest)
+        self.stresstest_text.place(x=80, y=345)
 
         # Settings
         self.settingsImage = Image.open('assets/dashboard/settings-icon.png')
@@ -93,59 +101,36 @@ class Dashboard:
                                 cursor='hand2', activebackground='#ffffff', command=self.Exit)
         self.exit_text.place(x=85, y=462)
 
-
-        # ======= TIME AND DATE ============
-        self.clock_image = Image.open('assets/dashboard/time.png')
-        photo = ImageTk.PhotoImage(self.clock_image)
-        self.date_time_image = Label(self.sidebar, image=photo, bg='#ffffff')
-        self.date_time_image.image = photo
-        self.date_time_image.place(x=88, y=20)
-
-        self.date_time = Label(self.window)
-        self.date_time.place(x=115, y=15)
-        self.show_time()
-        self.current_frame = None
-        self.show_dashboard()
-
     def show_dashboard(self):
         if self.current_frame is not None:
             self.current_frame.destroy()
+            self.headerText.config(text="Dashboard")
         self.current_frame = self.create_dashboard_frame()
 
-    def show_manage(self):
+    def show_stresstest(self):
         if self.current_frame is not None:
             self.current_frame.destroy()
-        self.current_frame = self.create_manage_frame()
+            self.headerText.config(text="Stress Test")
+        self.current_frame = self.create_stresstest_frame()
 
     def show_settings(self):
         if self.current_frame is not None:
             self.current_frame.destroy()
+            self.headerText.config(text="Settings")
         self.current_frame = self.create_settings_frame()
 
     def create_dashboard_frame(self):
-        self.heading = Label(self.window, text='Dashboard', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
-        self.heading.place(x=325, y=70)
+        frame = Frame(self.body, bg='#eff5f6')
+        frame.place(x=0, y=0, width=1040, height=655)
 
-        # ======== Body Frame 1 =======
-        self.bodyFrame1 = Frame(self.window, bg='#ffffff')
-        self.bodyFrame1.place(x=328, y=110, width=1040, height=350)
+        # Your Dashboard content creation code here
 
-        # ======== Body Frame 2 =======
-        self.bodyFrame2 = Frame(self.window, bg='#009aa5')
-        self.bodyFrame2.place(x=328, y=495, width=310, height=220)
+        # HEADER
+        # self.heading = Label(frame, text='Dashboard', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
+        # self.heading.place(x=0, y=0)
 
-        # ======== Body Frame 3 =======
-        self.bodyFrame3 = Frame(self.window, bg='#e21f26')
-        self.bodyFrame3.place(x=680, y=495, width=310, height=220)
-
-        # ======== Body Frame 4 ======
-        self.bodyFrame4 = Frame(self.window, bg='#ffcb1f')
-
-        self.bodyFrame4.place(x=1030, y=495, width=310, height=220)
-
-        # Data Base
+        # PIE CHART
         data = pd.read_excel("assets/Book1.xlsx")
-
         sumjulius = sum(data['Julius'])
         sumgideons = sum(data['Gideons'])
         sumjustice = sum(data['Justice'])
@@ -153,31 +138,26 @@ class Dashboard:
         sumsimon = sum(data['Simon'])
         sumdennis = sum(data['Dennis'])
 
-        #### Plotting pie chart #####
-        fig = plt.figure(figsize=(5, 5), dpi=100)
+        fig = plt.figure(figsize=(5, 3.5), dpi=100)
         fig.set_size_inches(5, 3.5)
 
-        # Data to plot
         labels = 'Julius', 'Gideons', 'Justice', 'Daniel', 'Simon', 'Dennis'
         sizes = [sumjulius, sumgideons, sumjustice, sumdaniel, sumsimon, sumdennis]
         colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue', 'Orange', 'red']
         explode = (0.2, 0, 0, 0, 0, 0)
 
-        # Plot pie chart
         plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+        plt.axis('equal')
 
-        plt.axis('equal')  # creates the pie chart like a circle
+        canvas = FigureCanvasTkAgg(fig, master=frame)
+        canvas.draw()
+        canvas.get_tk_widget().place(x=550, y=200, anchor=W)
 
-        canvasbar = FigureCanvasTkAgg(fig, master=self.window)
-        canvasbar.draw()
-        canvasbar.get_tk_widget().place(x=1120, y=285, anchor=CENTER)  # show the barchart on the ouput window
-
+        # BAR CHART
         fig = plt.figure(figsize=(5, 3.5), dpi=100)
         labels = ('Julius', 'Gideons', 'Justice', 'Daniel', 'Simon', 'Dennis')
         labelpos = np.arange(len(labels))
         studentsum = [sumjulius, sumgideons, sumjustice, sumdaniel, sumsimon, sumdennis]
-
-        ##This section formats the barchart for output
 
         plt.bar(labelpos, studentsum, align='center', alpha=1.0)
         plt.xticks(labelpos, labels)
@@ -187,78 +167,60 @@ class Dashboard:
         plt.title('Average raw mark for all subjects')
         plt.xticks(rotation=30, horizontalalignment="center")
 
-        # Applies the values on the top of the bar chart
         for index, datapoints in enumerate(studentsum):
-            plt.text(x=index, y=datapoints + 0.3, s=f"{datapoints}", fontdict=dict(fontsize=10), ha='center',
-                     va='bottom')
+            plt.text(x=index, y=datapoints + 0.3, s=f"{datapoints}", fontdict=dict(fontsize=10), ha='center', va='bottom')
 
-        ## This section draws a canvas to allow the barchart to appear in it
-        canvasbar = FigureCanvasTkAgg(fig, master=self.window)
+        canvasbar = FigureCanvasTkAgg(fig, master=frame)
         canvasbar.draw()
-        canvasbar.get_tk_widget().place(x=600, y=285, anchor=CENTER)  # show the barchart on the ouput window
+        canvasbar.get_tk_widget().place(x=20, y=200, anchor=W)
 
-        # Total People
-        self.totalPeopleImage = Image.open('assets/dashboard/left-icon.png')
-        photo = ImageTk.PhotoImage(self.totalPeopleImage)
-        self.totalPeople = Label(self.bodyFrame2, image=photo, bg='#009aa5')
-        self.totalPeople.image = photo
-        self.totalPeople.place(x=220, y=0)
+        return frame
 
-        self.totalPeople_text = Label(self.bodyFrame2, text='230', bg='#009aa5', font=("", 25, "bold"))
-        self.totalPeople_text.place(x=120, y=100)
+    def create_stresstest_frame(self):
+        frame = Frame(self.body, bg='#eff5f6')
+        frame.place(x=0, y=0, width=1040, height=655)
 
-        self.total_people = Label(self.bodyFrame2, text='Total People', bg='#009aa5', font=("", 13, "bold"))
-        self.total_people.place(x=5, y=5)
+        # Your Dashboard content creation code here
 
-        # Left
-        self.people_who_leftImage = Image.open('assets/dashboard/left-icon.png')
-        photo = ImageTk.PhotoImage(self.people_who_leftImage)
-        self.people_who_left = Label(self.bodyFrame3, image=photo, bg='#e21f26')
-        self.people_who_left.image = photo
-        self.people_who_left.place(x=220, y=0)
+        # HEADER
+        # self.heading = Label(frame, text='Stress Test', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
+        # self.heading.place(x=0, y=0)
 
-        self.people_who_left_text = Label(self.bodyFrame3, text='People Who Left', bg='#e21f26', font=("", 13, "bold"))
-        self.people_who_left_text.place(x=5, y=5)
+        # BODY FRAME 1
+        self.bodyFrame1 = Frame(frame, bg='#ffffff')
+        self.bodyFrame1.place(x=0, y=0, width=1040, height=350)
 
-        self.people_who_left = Label(self.bodyFrame3, text='100', bg='#e21f26', font=("", 25, "bold"))
-        self.people_who_left.place(x=120, y=100)
+        # YOUR CODE FOR BODY FRAME 1 HERE
 
-        # Earnings
-        self.earnImage = Image.open('assets/dashboard/earn3.png')
-        photo = ImageTk.PhotoImage(self.earnImage)
-        self.earn = Label(self.bodyFrame4, image=photo, bg='#ffcb1f')
-        self.earn.image = photo
-        self.earn.place(x=220, y=0)
-
-        self.earn_text = Label(self.bodyFrame4, text='Earnings', bg='#ffcb1f', font=("", 13, "bold"))
-        self.earn_text.place(x=5, y=5)
-
-        self.earn_figure = Label(self.bodyFrame4, text='$40,000.00', bg='#ffcb1f', font=("", 25, "bold"))
-        self.earn_figure.place(x=80, y=100)
-
-    def create_manage_frame(self):
-        self.heading = Label(self.window, text='Manage', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
-        self.heading.place(x=325, y=70)
+        return frame
 
     def create_settings_frame(self):
-        self.heading = Label(self.window, text='Settings', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
-        self.heading.place(x=325, y=70)
-    
-    def show_time(self):
-        self.time = time.strftime("%H:%M:%S")
-        self.date = time.strftime('%Y/%m/%d')
-        set_text = f" {self.time} \n {self.date}"
-        self.date_time.configure(text=set_text, font=("", 13, "bold"), bd=0, bg="white", fg="black")
-        self.date_time.after(100, self.show_time)
+        frame = Frame(self.body, bg='#eff5f6')
+        frame.place(x=0, y=0, width=1040, height=655)
+
+        # Your Dashboard content creation code here
+
+        # HEADER
+        # self.heading = Label(frame, text='Settings', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
+        # self.heading.place(x=0, y=0)
+
+        # BODY FRAME 1
+        self.bodyFrame1 = Frame(frame, bg='#ffffff')
+        self.bodyFrame1.place(x=10, y=110, width=1040, height=350)
+
+        # YOUR CODE FOR BODY FRAME 1 HERE
+
+        return frame
 
     def Exit(self):
-        self.window.quit()
+        if messagebox.askyesno("Quit", " Leave App?") == True:
+            self.window.quit()
+            exit(0)
 
-def win():
-    window = Tk()
-    Dashboard(window)
-    window.mainloop()
+    def win():
+        window = Tk()
+        Dashboard(window)
+        window.mainloop()
 
-if __name__ =='__main__':
-    plt.show()
-    win()
+    # if __name__ == '__main__':
+    #     win()
