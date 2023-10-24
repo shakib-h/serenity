@@ -5,7 +5,8 @@ import pandas as pd
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 import numpy as np
-
+from frames.moodtracker import MoodTracker
+from frames.articles import BlogPage
 import helper
 
 class Dashboard:
@@ -40,7 +41,7 @@ class Dashboard:
 
         # BODY
         self.body = Frame(self.window, bg='#eff5f6')
-        self.body.place(x=300, y=60, width=1040, height=655)
+        self.body.place(x=300, y=60, width=1066, height=708)
 
         # Initialize with the Dashboard frame
         self.show_dashboard()
@@ -62,11 +63,11 @@ class Dashboard:
         photo = ImageTk.PhotoImage(self.dashboardImage)
         self.dashboard = Label(self.sidebar, image=photo, bg='#ffffff')
         self.dashboard.image = photo
-        self.dashboard.place(x=35, y=289)
+        self.dashboard.place(x=35, y=290)
 
         self.dashboard_text = Button(self.sidebar, text='Dashboard', bg='#ffffff', font=("", 13, "bold"), bd=0,
                                      cursor='hand2', activebackground='#ffffff', command=self.show_dashboard)
-        self.dashboard_text.place(x=80, y=291)
+        self.dashboard_text.place(x=80, y=290)
 
         # Stress Test
         self.stresstestImage = Image.open('assets/dashboard/manage-icon.png')
@@ -101,6 +102,28 @@ class Dashboard:
                                 cursor='hand2', activebackground='#ffffff', command=self.Exit)
         self.exit_text.place(x=85, y=462)
 
+        # Mood Tracker
+        self.moodtrackerImage = Image.open('assets/dashboard/manage-icon.png')
+        photo = ImageTk.PhotoImage(self.moodtrackerImage)
+        self.moodtracker = Label(self.sidebar, image=photo, bg='#ffffff')
+        self.moodtracker.image = photo
+        self.moodtracker.place(x=35, y=502)
+
+        self.moodtracker_text = Button(self.sidebar, text='Mood Tracker', bg='#ffffff', font=("", 13, "bold"), bd=0,
+                                  cursor='hand2', activebackground='#ffffff', command=self.show_moodtracker)
+        self.moodtracker_text.place(x=80, y=512)
+
+        #Articles
+        self.articlesImage = Image.open('assets/dashboard/manage-icon.png')
+        photo = ImageTk.PhotoImage(self.articlesImage)
+        self.articles = Label(self.sidebar, image=photo, bg='#ffffff')
+        self.articles.image = photo
+        self.articles.place(x=35, y=562)
+
+        self.articles_text = Button(self.sidebar, text='Articles', bg='#ffffff', font=("", 13, "bold"), bd=0,
+                                  cursor='hand2', activebackground='#ffffff', command=self.show_articles)
+        self.articles_text.place(x=80, y=572)
+
     def show_dashboard(self):
         if self.current_frame is not None:
             self.current_frame.destroy()
@@ -118,6 +141,24 @@ class Dashboard:
             self.current_frame.destroy()
             self.headerText.config(text="Settings")
         self.current_frame = self.create_settings_frame()
+    
+    def show_moodtracker(self):
+        if self.current_frame is not None:
+            self.current_frame.destroy()
+            self.headerText.config(text="Mood Tracker")
+        self.current_frame = self.create_moodtracker_frame()
+
+    def show_exercise(self):
+        if self.current_frame is not None:
+            self.current_frame.destroy()
+            self.headerText.config(text="Exercise")
+        self.current_frame = self.create_exercise_frame()
+    
+    def show_articles(self):
+        if self.current_frame is not None:
+            self.current_frame.destroy()
+            self.headerText.config(text="Articles")
+        self.current_frame = self.create_articles_frame()
 
     def create_dashboard_frame(self):
         frame = Frame(self.body, bg='#eff5f6')
@@ -193,22 +234,30 @@ class Dashboard:
         # YOUR CODE FOR BODY FRAME 1 HERE
 
         return frame
+    
+    def create_articles_frame(self):
+        frame = Frame(self.body, bg='#eff5f6')
+        frame.place(x=0, y=0, width=1066, height=708)
+        frame = BlogPage(frame)
+
+        return frame
+
+    def create_exercise_frame(self):
+        frame = Frame(self.body, bg='#eff5f6')
+        frame.place(x=0, y=0, width=1040, height=655)
+
+        return frame
+
+    def create_moodtracker_frame(self):
+        frame = Frame(self.body, bg='#eff5f6')
+        frame.place(x=0, y=0, width=1040, height=655)
+        frame = MoodTracker(frame)
+
+        return frame
 
     def create_settings_frame(self):
         frame = Frame(self.body, bg='#eff5f6')
         frame.place(x=0, y=0, width=1040, height=655)
-
-        # Your Dashboard content creation code here
-
-        # HEADER
-        # self.heading = Label(frame, text='Settings', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
-        # self.heading.place(x=0, y=0)
-
-        # BODY FRAME 1
-        self.bodyFrame1 = Frame(frame, bg='#ffffff')
-        self.bodyFrame1.place(x=10, y=110, width=1040, height=350)
-
-        # YOUR CODE FOR BODY FRAME 1 HERE
 
         return frame
 
@@ -222,5 +271,5 @@ class Dashboard:
         Dashboard(window)
         window.mainloop()
 
-    # if __name__ == '__main__':
-    #     win()
+if __name__ == '__main__':
+    Dashboard.win()
