@@ -1,3 +1,4 @@
+import subprocess
 from tkinter import *
 from tkinter import messagebox
 from PIL import ImageTk, Image
@@ -7,6 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from frames.moodtracker import MoodTracker
 from frames.articles import BlogPage
+from frames.stresstest import StressTest
 import helper
 
 class Dashboard:
@@ -30,7 +32,7 @@ class Dashboard:
         self.headerText.place(x=5, y=12)
 
         self.logout_text = Button(self.header, text='Logout', bg=helper.accentColor, font=("", 13, "bold"), bd=0, fg='white',
-                                  cursor='hand2', activebackground='#32cf8e', command=self.Exit)
+                                  cursor='hand2', activebackground='#32cf8e', command=self.Logout)
         self.logout_text.place(x=980, y=15)
 
         # SIDEBAR
@@ -80,49 +82,49 @@ class Dashboard:
                                   cursor='hand2', activebackground='#ffffff', command=self.show_stresstest)
         self.stresstest_text.place(x=80, y=345)
 
-        # Settings
-        self.settingsImage = Image.open('assets/dashboard/settings-icon.png')
-        photo = ImageTk.PhotoImage(self.settingsImage)
-        self.settings = Label(self.sidebar, image=photo, bg='#ffffff')
-        self.settings.image = photo
-        self.settings.place(x=35, y=402)
-
-        self.settings_text = Button(self.sidebar, text='Settings', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                    cursor='hand2', activebackground='#ffffff', command=self.show_settings)
-        self.settings_text.place(x=80, y=402)
-
-        # Exit
-        self.exitImage = Image.open('assets/dashboard/exit-icon.png')
-        photo = ImageTk.PhotoImage(self.exitImage)
-        self.exit = Label(self.sidebar, image=photo, bg='#ffffff')
-        self.exit.image = photo
-        self.exit.place(x=25, y=452)
-
-        self.exit_text = Button(self.sidebar, text='Exit', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                cursor='hand2', activebackground='#ffffff', command=self.Exit)
-        self.exit_text.place(x=85, y=462)
-
         # Mood Tracker
         self.moodtrackerImage = Image.open('assets/dashboard/manage-icon.png')
         photo = ImageTk.PhotoImage(self.moodtrackerImage)
         self.moodtracker = Label(self.sidebar, image=photo, bg='#ffffff')
         self.moodtracker.image = photo
-        self.moodtracker.place(x=35, y=502)
+        self.moodtracker.place(x=35, y=402)
 
         self.moodtracker_text = Button(self.sidebar, text='Mood Tracker', bg='#ffffff', font=("", 13, "bold"), bd=0,
                                   cursor='hand2', activebackground='#ffffff', command=self.show_moodtracker)
-        self.moodtracker_text.place(x=80, y=512)
+        self.moodtracker_text.place(x=80, y=407)
 
         #Articles
         self.articlesImage = Image.open('assets/dashboard/manage-icon.png')
         photo = ImageTk.PhotoImage(self.articlesImage)
         self.articles = Label(self.sidebar, image=photo, bg='#ffffff')
         self.articles.image = photo
-        self.articles.place(x=35, y=562)
+        self.articles.place(x=35, y=460)
 
         self.articles_text = Button(self.sidebar, text='Articles', bg='#ffffff', font=("", 13, "bold"), bd=0,
                                   cursor='hand2', activebackground='#ffffff', command=self.show_articles)
-        self.articles_text.place(x=80, y=572)
+        self.articles_text.place(x=85, y=462)
+
+        # Settings
+        self.settingsImage = Image.open('assets/dashboard/settings-icon.png')
+        photo = ImageTk.PhotoImage(self.settingsImage)
+        self.settings = Label(self.sidebar, image=photo, bg='#ffffff')
+        self.settings.image = photo
+        self.settings.place(x=35, y=512)
+
+        self.settings_text = Button(self.sidebar, text='Settings', bg='#ffffff', font=("", 13, "bold"), bd=0,
+                                    cursor='hand2', activebackground='#ffffff', command=self.show_settings)
+        self.settings_text.place(x=80, y=512)
+
+        # Exit
+        self.exitImage = Image.open('assets/dashboard/exit-icon.png')
+        photo = ImageTk.PhotoImage(self.exitImage)
+        self.exit = Label(self.sidebar, image=photo, bg='#ffffff')
+        self.exit.image = photo
+        self.exit.place(x=25, y=555)
+
+        self.exit_text = Button(self.sidebar, text='Exit', bg='#ffffff', font=("", 13, "bold"), bd=0,
+                                cursor='hand2', activebackground='#ffffff', command=self.Exit)
+        self.exit_text.place(x=80, y=565)
 
     def show_dashboard(self):
         if self.current_frame is not None:
@@ -220,18 +222,7 @@ class Dashboard:
     def create_stresstest_frame(self):
         frame = Frame(self.body, bg='#eff5f6')
         frame.place(x=0, y=0, width=1040, height=655)
-
-        # Your Dashboard content creation code here
-
-        # HEADER
-        # self.heading = Label(frame, text='Stress Test', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
-        # self.heading.place(x=0, y=0)
-
-        # BODY FRAME 1
-        self.bodyFrame1 = Frame(frame, bg='#ffffff')
-        self.bodyFrame1.place(x=0, y=0, width=1040, height=350)
-
-        # YOUR CODE FOR BODY FRAME 1 HERE
+        frame = StressTest(frame)
 
         return frame
     
@@ -260,6 +251,11 @@ class Dashboard:
         frame.place(x=0, y=0, width=1040, height=655)
 
         return frame
+    
+    def Logout(self):
+        if messagebox.askyesno("Logout", " Do you want to logout?") == True:
+            self.window.destroy()
+            subprocess.run(["python", "login.py"])
 
     def Exit(self):
         if messagebox.askyesno("Quit", " Leave App?") == True:
