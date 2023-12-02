@@ -80,8 +80,8 @@ class Login:
     # LOGIN SUCCESS
     def success(self):
         messagebox.showinfo("Success","Login successful")
-        subprocess.run(["python", "dashboard.py"])
         self.loginw.destroy()
+        subprocess.run(["python", "dashboard.py"])
 
     # LOGIN FAILURE
     def fail(self):
