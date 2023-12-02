@@ -61,22 +61,27 @@ class BlogPage:
             link = blog["link"]
             image_url = blog["image_url"]
 
-            photo = self.load_image(image_url, box_width, box_height)
-            if photo:
-                target_frame = self.frame1 if i % 2 == 0 else self.frame2
+            # Create a placeholder image
+            placeholder_img = Image.new("RGB", (box_width, box_height), "white")
+            placeholder_photo = ImageTk.PhotoImage(placeholder_img)
 
-                label = ttk.Label(
-                    target_frame,
-                    text=title,
-                    image=photo,
-                    compound="top",
-                    cursor="hand2",
-                    style="RoundedRect.TLabel"
-                )
-                label.image = photo
-                label.grid(row=i // 2, padx=10, pady=10, sticky="nsew")
+            target_frame = self.frame1 if i % 2 == 0 else self.frame2
 
-                label.bind("<Button-1>", lambda event, link=link: self.open_link(link))
+            label = ttk.Label(
+                target_frame,
+                text=title,
+                image=placeholder_photo,
+                compound="top",
+                cursor="hand2",
+                style="RoundedRect.TLabel"
+            )
+            label.image = placeholder_photo
+            label.grid(row=i // 2, padx=10, pady=10, sticky="nsew")
+
+            # Load the actual image after a delay
+            self.load_image_after_delay(label, image_url, box_width, box_height)
+
+            label.bind("<Button-1>", lambda event, link=link: self.open_link(link))
 
         # Configure row and column weights for grid resizing
         self.frame.grid_rowconfigure(0, weight=1)
@@ -86,17 +91,24 @@ class BlogPage:
     def open_link(self, link):
         webbrowser.open(link)
 
-    def load_image(self, image_url, width, height):
-        try:
-            response = requests.get(image_url)
-            img = Image.open(BytesIO(response.content))
-            img = img.resize((width, height), Image.LANCZOS)  # Resize the image
-            photo = ImageTk.PhotoImage(img)
-            return photo
-        except Exception as e:
-            print(f"Error loading image: {e}")
-            return None
+    def load_image_after_delay(self, label, image_url, width, height):
+        # Define a function to load the image and update the label
+        def load_image_and_update_label():
+            try:
+                response = requests.get(image_url)
+                img = Image.open(BytesIO(response.content))
+                img = img.resize((width, height), Image.LANCZOS)  # Resize the image
+                photo = ImageTk.PhotoImage(img)
 
+                # Update the label with the loaded image
+                label.config(image=photo)
+                label.image = photo
+
+            except Exception as e:
+                print(f"Error loading image: {e}")
+
+        # Schedule the image loading function after a delay
+        label.after(100, load_image_and_update_label)
 
     def destroy(self):
         self.parent_frame.destroy()
