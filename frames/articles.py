@@ -1,3 +1,4 @@
+import threading
 import tkinter as tk
 from tkinter import ttk
 import webbrowser
@@ -107,8 +108,9 @@ class BlogPage:
             except Exception as e:
                 print(f"Error loading image: {e}")
 
-        # Schedule the image loading function after a delay
-        label.after(100, load_image_and_update_label)
+        # Schedule the image loading function after a delay using threading
+        thread = threading.Thread(target=load_image_and_update_label)
+        thread.start()
 
     def destroy(self):
         self.parent_frame.destroy()

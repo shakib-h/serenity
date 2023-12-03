@@ -1,53 +1,68 @@
+from datetime import datetime
 import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
+import mysql.connector
+import helper
 
 class MoodTracker:
-    def __init__(self, parent_frame):
+    def __init__(self, parent_frame, username):
         self.parent_frame = parent_frame
-        self.mood_value = 0
+        self.username = username
+        self.mood_value = ""
+        self.create_or_check_tables()
+        self.happy_button = tk.Button(self.parent_frame, text="😁", command=self.happy_mood, font=('Roboto', 36))
+        self.slightly_happy_button = tk.Button(self.parent_frame, text="🙁", command=self.slightly_happy_mood, font=('Roboto', 36))
+        self.sad_button = tk.Button(self.parent_frame, text="😥", command=self.sad_mood, font=('Roboto', 36))
+        self.crying_button = tk.Button(self.parent_frame, text="😭", command=self.crying_mood, font=('Roboto', 36))
+        self.mood_label = ttk.Label(self.parent_frame, text="Mood:", font=('Roboto', 32), anchor='center', background="#eff5f6")
+        self.mood_value_label = ttk.Label(self.parent_frame, text="", font=('Roboto', 32), anchor='center', background='#eff5f6')
+        self.setup_layout()
 
-        self.feeling_label = ttk.Label(self.parent_frame, text="How are you feeling today?", font=('Arial', 30), anchor='center')
-        self.feeling_label.place(x=533, y=150, anchor='center')
+    def create_or_check_tables(self):
+        base = mysql.connector.connect(**helper.db_config)
+        cur = base.cursor()
+        cur.execute("CREATE TABLE IF NOT EXISTS mood_data ("
+                    "id INT AUTO_INCREMENT PRIMARY KEY, mood INT, user VARCHAR(20), "
+                    "date DATE, time TIME, FOREIGN KEY (user) REFERENCES users(username));")
+        base.commit()
+        base.close()
 
-        button_font = ('Arial', 36)
-        self.happy_button = tk.Button(self.parent_frame, text="😁", command=self.happy_mood, font=button_font)
-        self.slightly_happy_button = tk.Button(self.parent_frame, text="🙁", command=self.slightly_happy_mood, font=button_font)
-        self.sad_button = tk.Button(self.parent_frame, text="😥", command=self.sad_mood, font=button_font)
-        self.crying_button = tk.Button(self.parent_frame, text="😭", command=self.crying_mood, font=button_font)
-
-        mood_label_font = ('Arial', 48)
-        self.mood_label = ttk.Label(self.parent_frame, text="Mood:", font=mood_label_font, anchor='center')
-        mood_value_label_font = ('Arial', 48)
-        self.mood_value_label = ttk.Label(self.parent_frame, text="0%", font=mood_value_label_font, anchor='center')
-
+    def setup_layout(self):
         self.happy_button.place(x=233, y=300, anchor='center')
         self.slightly_happy_button.place(x=433, y=300, anchor='center')
         self.sad_button.place(x=633, y=300, anchor='center')
         self.crying_button.place(x=833, y=300, anchor='center')
-        self.mood_label.place(x=343, y=400, anchor='center')
+        self.mood_label.place(x=380, y=400, anchor='center')
         self.mood_value_label.place(x=600, y=400, anchor='center')
-
-        self.update_mood_value_label()
+        # self.save_mood_button.place(x=600, y=500, anchor='center')
+        # self.update_mood_value_label()
 
     def happy_mood(self):
-        self.mood_value = 100
+        self.mood_value = "Happy"
         self.update_mood_value_label()
 
     def slightly_happy_mood(self):
-        self.mood_value = 50
+        self.mood_value = "Neutral"
         self.update_mood_value_label()
 
     def sad_mood(self):
-        self.mood_value = 25
+        self.mood_value = "Sad"
         self.update_mood_value_label()
 
     def crying_mood(self):
-        self.mood_value = 5
+        self.mood_value = "Broken"
         self.update_mood_value_label()
 
     def update_mood_value_label(self):
-        self.mood_value_label["text"] = f"{self.mood_value}%"
+        self.mood_value_label["text"] = f"{self.mood_value}"
+        base = mysql.connector.connect(**helper.db_config)
+        cur = base.cursor()
+        current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        cur.execute("INSERT INTO mood_data (mood, user, date, time) VALUES (%s, %s, %s, %s)",
+                    (self.mood_value, self.username, current_datetime.split()[0], current_datetime.split()[1]))
+        base.commit()
+        base.close()
 
     def destroy(self):
         self.parent_frame.destroy()

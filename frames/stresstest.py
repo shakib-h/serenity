@@ -1,12 +1,17 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import *
+import mysql.connector
+from datetime import datetime
+import helper
 
 class StressTest:
-    def __init__(self, parent_frame):
+    def __init__(self, parent_frame, username):
         self.parent_frame = parent_frame
-        # self.parent_frame.title("Stress Test")
-        # self.parent_frame.geometry("600x600")
-        self.parent_frame.configure(bg="#325343")
+        self.username = username
+
+        # Check if tables exist, create if needed
+        self.check_and_create_tables()
 
         self.questions = [
             '''Q1 : How often do you feel overwhelmed with your life?''',
@@ -32,13 +37,26 @@ class StressTest:
         self.question_text = None
         self.option_buttons = []
 
-        self.label = tk.Label(self.parent_frame, text="Take a test to check your stress level!", height=2, bg="#325343",
-                              font=("Impact", 20), fg="#a6de9b")
-        self.start_button = tk.Button(self.parent_frame, height=3, width=10, text="Start test", bg="#325343",
-                                      fg='#ffffff', font=("Impact", 20), command=self.start)
+        self.stresslabel = ttk.Label(self.parent_frame, text="Take a test to check your stress level!",
+                                     font=("Roboto", 20), background="#eff5f6")
+        self.stresslabel.place(x=533, y=150, anchor='center')
+        self.stresslabel_button = tk.Button(self.parent_frame, height=3, width=10, text="Start test", bg="#eff5f6",
+                                            fg='#000000', font=("Roboto", 20), command=self.start)
+        self.stresslabel_button.place(x=533, y=250, anchor='center')
 
-        self.label.pack()
-        self.start_button.pack()
+    def check_and_create_tables(self):
+        base = mysql.connector.connect(**helper.db_config)
+        cur = base.cursor()
+
+        # Check if stress_results table exists, create if needed
+        cur.execute("SHOW TABLES LIKE 'stress_results'")
+        result = cur.fetchone()
+        if not result:
+            cur.execute("CREATE TABLE stress_results (id INT AUTO_INCREMENT PRIMARY KEY, user VARCHAR(255), "
+                        "stress_level FLOAT,date DATE, time TIME)")
+            base.commit()
+
+        base.close()
 
     def selected(self):
         self.user_input.append(self.radiovar.get())
@@ -73,13 +91,22 @@ class StressTest:
         question_bg = Frame(height=420, width=580, bg="#a6de9b", master=self.parent_frame)
         question_bg.pack()
         stress_result += str(stress_level)
-        stress = tk.Label(question_bg, text=stress_result, bg='#325343', fg='#a6de9b', font=('Arial', 21))
+        stress = tk.Label(question_bg, text=stress_result, bg='#eff5f6', fg='#000000', font=('Arial', 21))
         stress.pack()
 
+        # Save stress result to the database
+        base = mysql.connector.connect(**helper.db_config)
+        cur = base.cursor()
+        current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        cur.execute("INSERT INTO stress_results (user, stress_level, date, time) VALUES (%s, %s, %s, %s)",
+                    (self.username, stress_level, current_datetime.split()[0], current_datetime.split()[1]))
+        base.commit()
+        base.close()
+
     def start(self):
-        self.label.destroy()
-        self.start_button.destroy()
-        question_bg = Frame(height=420, width=580, bg="#a6de9b", master=self.parent_frame)
+        self.stresslabel.destroy()
+        self.stresslabel_button.destroy()
+        question_bg = Frame(height=420, width=580, bg="#eff5f6", master=self.parent_frame)
         question_bg.pack()
         self.radiovar = IntVar()
         self.radiovar.set(-1)
@@ -89,22 +116,21 @@ class StressTest:
 
         self.option_buttons = []
 
-        ques_label = tk.Label(question_bg, textvariable=self.question_text, bg='#a6de9b', fg='#325343',
+        ques_label = tk.Label(question_bg, textvariable=self.question_text, wraplength=900, bg='#eff5f6', fg='#000000',
                               font=('Arial', 21))
         ques_label.pack()
 
         for i in range(4):
-            option = tk.Radiobutton(question_bg, text="", bg='#a6de9b', fg='#325343', font=('Arial', 16), value=i,
+            option = tk.Radiobutton(question_bg, text="", bg='#eff5f6', fg='#000000', font=('Arial', 16), value=i,
                                     variable=self.radiovar, state=DISABLED)
             option.pack()
             self.option_buttons.append(option)
 
         self.load_question()
 
-        next_button = tk.Button(question_bg, text="Next", command=self.selected, bg='#325343', fg='#a6de9b',
+        next_button = tk.Button(question_bg, text="Next", command=self.selected, bg='#000000', fg='#a6de9b',
                                 font=('Arial', 20))
         next_button.pack()
-
 
     def destroy(self):
         self.parent_frame.destroy()

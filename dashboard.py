@@ -1,11 +1,11 @@
+import argparse
 import subprocess
 from tkinter import *
 from tkinter import messagebox
 from PIL import ImageTk, Image
-import pandas as pd
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.pyplot as plt
-import numpy as np
+import mysql.connector
+from frames.chatUI import ChatUI
+from frames.dashboardUI import DashboardUI
 from frames.moodtracker import MoodTracker
 from frames.articles import BlogPage
 from frames.stresstest import StressTest
@@ -13,8 +13,14 @@ import helper
 
 class Dashboard:
     def __init__(self, window):
+        parser = argparse.ArgumentParser(description='Dashboard Application')
+        parser.add_argument('--username', type=str, help='Username for the dashboard')
+        args = parser.parse_args()
+        self.username = args.username if args.username else "User"
+        self.users_data = self.get_user_data()
+        self.user_name = self.users_data['name'] if self.users_data else "User"
         self.window = window
-        self.window.title('Dashboard - Serenity')
+        self.window.title(f'{self.user_name}\'s Dashboard - Serenity')
         self.window.geometry(helper.geometry)
         self.window.resizable(0, 0)
         self.window.config(background='#eff5f6')
@@ -28,7 +34,8 @@ class Dashboard:
         self.header = Frame(self.window, bg=helper.primaryColor)
         self.header.place(x=300, y=0, width=1070, height=60)
 
-        self.headerText = Label(self.header, text="Dashboard", bg=helper.primaryColor, font=("", 20, "bold"))
+        self.headerText = Label(self.header, text=f"Hello {self.user_name}", bg=helper.primaryColor, font=("", 20, "bold"))
+
         self.headerText.place(x=5, y=12)
 
         self.logout_text = Button(self.header, text='Logout', bg=helper.accentColor, font=("", 13, "bold"), bd=0, fg='white',
@@ -48,6 +55,16 @@ class Dashboard:
         # Initialize with the Dashboard frame
         self.show_dashboard()
 
+    def get_user_data(self):
+        # Fetch the user's data from the database based on the username
+        base = mysql.connector.connect(**helper.db_config)
+        cur = base.cursor(dictionary=True)  # Use dictionary cursor for easier data access
+        cur.execute("SELECT * FROM users WHERE username = %s", (self.username,))
+        result = cur.fetchone()
+        base.close()
+        return result if result else {}
+
+
     def create_sidebar(self):
         # Logo
         self.logoImage = Image.open('assets/dashboard/hyy.png')
@@ -57,74 +74,77 @@ class Dashboard:
         self.logo.place(x=70, y=80)
 
         # Name of brand/person
-        self.brandName = Label(self.sidebar, text='Hello Hooman', bg='#ffffff', font=("", 15, "bold"))
+        self.brandName = Label(self.sidebar, text=f'Hello {self.user_name}', bg='#ffffff', font=("", 15, "bold"))
         self.brandName.place(x=80, y=200)
 
         # Dashboard
-        self.dashboardImage = Image.open('assets/dashboard/dashboard-icon.png')
+        self.dashboardImage = Image.open('assets/dashboard/icons/icons8-calendar-36.png')
         photo = ImageTk.PhotoImage(self.dashboardImage)
         self.dashboard = Label(self.sidebar, image=photo, bg='#ffffff')
         self.dashboard.image = photo
-        self.dashboard.place(x=35, y=290)
+        self.dashboard.grid(row=0, column=0, pady=(280, 0), padx=(35, 0), sticky="w")
 
         self.dashboard_text = Button(self.sidebar, text='Dashboard', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                     cursor='hand2', activebackground='#ffffff', command=self.show_dashboard)
-        self.dashboard_text.place(x=80, y=290)
+                                    cursor='hand2', activebackground='#ffffff', command=self.show_dashboard)
+        self.dashboard_text.grid(row=0, column=1, pady=(280, 0), padx=(0, 25), sticky="w")
 
         # Stress Test
-        self.stresstestImage = Image.open('assets/dashboard/manage-icon.png')
+        self.stresstestImage = Image.open('assets/dashboard/icons/icons8-anxious-face-with-sweat-36.png')
         photo = ImageTk.PhotoImage(self.stresstestImage)
         self.stresstest = Label(self.sidebar, image=photo, bg='#ffffff')
         self.stresstest.image = photo
-        self.stresstest.place(x=35, y=340)
+        self.stresstest.grid(row=1, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
 
         self.stresstest_text = Button(self.sidebar, text='Stress Test', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                  cursor='hand2', activebackground='#ffffff', command=self.show_stresstest)
-        self.stresstest_text.place(x=80, y=345)
+                                    cursor='hand2', activebackground='#ffffff', command=self.show_stresstest)
+        self.stresstest_text.grid(row=1, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
 
         # Mood Tracker
-        self.moodtrackerImage = Image.open('assets/dashboard/manage-icon.png')
+        self.moodtrackerImage = Image.open('assets/dashboard/icons/icons8-slightly-smiling-face-36.png')
         photo = ImageTk.PhotoImage(self.moodtrackerImage)
         self.moodtracker = Label(self.sidebar, image=photo, bg='#ffffff')
         self.moodtracker.image = photo
-        self.moodtracker.place(x=35, y=402)
+        self.moodtracker.grid(row=2, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
 
         self.moodtracker_text = Button(self.sidebar, text='Mood Tracker', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                  cursor='hand2', activebackground='#ffffff', command=self.show_moodtracker)
-        self.moodtracker_text.place(x=80, y=407)
+                                        cursor='hand2', activebackground='#ffffff', command=self.show_moodtracker)
+        self.moodtracker_text.grid(row=2, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
 
-        #Articles
-        self.articlesImage = Image.open('assets/dashboard/manage-icon.png')
+        # Articles
+        self.articlesImage = Image.open('assets/dashboard/icons/icons8-newspaper-emoji-36.png')
         photo = ImageTk.PhotoImage(self.articlesImage)
         self.articles = Label(self.sidebar, image=photo, bg='#ffffff')
         self.articles.image = photo
-        self.articles.place(x=35, y=460)
+        self.articles.grid(row=3, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
 
         self.articles_text = Button(self.sidebar, text='Articles', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                  cursor='hand2', activebackground='#ffffff', command=self.show_articles)
-        self.articles_text.place(x=85, y=462)
+                                    cursor='hand2', activebackground='#ffffff', command=self.show_articles)
+        self.articles_text.grid(row=3, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
 
-        # Settings
-        self.settingsImage = Image.open('assets/dashboard/settings-icon.png')
-        photo = ImageTk.PhotoImage(self.settingsImage)
-        self.settings = Label(self.sidebar, image=photo, bg='#ffffff')
-        self.settings.image = photo
-        self.settings.place(x=35, y=512)
+        # ChatBot
+        self.chatbotImage = Image.open('assets/dashboard/icons/icons8-speech-balloon-36.png')
+        photo = ImageTk.PhotoImage(self.chatbotImage)
+        self.chatbot = Label(self.sidebar, image=photo, bg='#ffffff')
+        self.chatbot.image = photo
+        self.chatbot.grid(row=4, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
 
-        self.settings_text = Button(self.sidebar, text='Settings', bg='#ffffff', font=("", 13, "bold"), bd=0,
-                                    cursor='hand2', activebackground='#ffffff', command=self.show_settings)
-        self.settings_text.place(x=80, y=512)
+        self.chatbot_text = Button(self.sidebar, text='ChatBot', bg='#ffffff', font=("", 13, "bold"), bd=0,
+                                    cursor='hand2', activebackground='#ffffff', command=self.show_chatbot)
+        self.chatbot_text.grid(row=4, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
 
         # Exit
-        self.exitImage = Image.open('assets/dashboard/exit-icon.png')
+        self.exitImage = Image.open('assets/dashboard/icons/icons8-cross-36.png')
         photo = ImageTk.PhotoImage(self.exitImage)
         self.exit = Label(self.sidebar, image=photo, bg='#ffffff')
         self.exit.image = photo
-        self.exit.place(x=25, y=555)
+        self.exit.grid(row=5, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
 
         self.exit_text = Button(self.sidebar, text='Exit', bg='#ffffff', font=("", 13, "bold"), bd=0,
                                 cursor='hand2', activebackground='#ffffff', command=self.Exit)
-        self.exit_text.place(x=80, y=565)
+        self.exit_text.grid(row=5, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
+
+
+
 
     def show_dashboard(self):
         if self.current_frame is not None:
@@ -138,11 +158,11 @@ class Dashboard:
             self.headerText.config(text="Stress Test")
         self.current_frame = self.create_stresstest_frame()
 
-    def show_settings(self):
+    def show_chatbot(self):
         if self.current_frame is not None:
             self.current_frame.destroy()
-            self.headerText.config(text="Settings")
-        self.current_frame = self.create_settings_frame()
+            self.headerText.config(text="ChatBot")
+        self.current_frame = self.create_chatbot_frame()
     
     def show_moodtracker(self):
         if self.current_frame is not None:
@@ -165,64 +185,13 @@ class Dashboard:
     def create_dashboard_frame(self):
         frame = Frame(self.body, bg='#eff5f6')
         frame.place(x=0, y=0, width=1040, height=655)
-
-        # Your Dashboard content creation code here
-
-        # HEADER
-        # self.heading = Label(frame, text='Dashboard', font=("", 13, "bold"), fg='#0064d3', bg='#eff5f6')
-        # self.heading.place(x=0, y=0)
-
-        # PIE CHART
-        data = pd.read_excel("assets/Book1.xlsx")
-        sumjulius = sum(data['Julius'])
-        sumgideons = sum(data['Gideons'])
-        sumjustice = sum(data['Justice'])
-        sumdaniel = sum(data['Daniel'])
-        sumsimon = sum(data['Simon'])
-        sumdennis = sum(data['Dennis'])
-
-        fig = plt.figure(figsize=(5, 3.5), dpi=100)
-        fig.set_size_inches(5, 3.5)
-
-        labels = 'Julius', 'Gideons', 'Justice', 'Daniel', 'Simon', 'Dennis'
-        sizes = [sumjulius, sumgideons, sumjustice, sumdaniel, sumsimon, sumdennis]
-        colors = ['gold', 'yellowgreen', 'lightcoral', 'lightskyblue', 'Orange', 'red']
-        explode = (0.2, 0, 0, 0, 0, 0)
-
-        plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
-        plt.axis('equal')
-
-        canvas = FigureCanvasTkAgg(fig, master=frame)
-        canvas.draw()
-        canvas.get_tk_widget().place(x=550, y=200, anchor=W)
-
-        # BAR CHART
-        fig = plt.figure(figsize=(5, 3.5), dpi=100)
-        labels = ('Julius', 'Gideons', 'Justice', 'Daniel', 'Simon', 'Dennis')
-        labelpos = np.arange(len(labels))
-        studentsum = [sumjulius, sumgideons, sumjustice, sumdaniel, sumsimon, sumdennis]
-
-        plt.bar(labelpos, studentsum, align='center', alpha=1.0)
-        plt.xticks(labelpos, labels)
-        plt.ylabel('Average raw mark')
-        plt.xlabel('Students')
-        plt.tight_layout(pad=2.2, w_pad=0.5, h_pad=0.1)
-        plt.title('Average raw mark for all subjects')
-        plt.xticks(rotation=30, horizontalalignment="center")
-
-        for index, datapoints in enumerate(studentsum):
-            plt.text(x=index, y=datapoints + 0.3, s=f"{datapoints}", fontdict=dict(fontsize=10), ha='center', va='bottom')
-
-        canvasbar = FigureCanvasTkAgg(fig, master=frame)
-        canvasbar.draw()
-        canvasbar.get_tk_widget().place(x=20, y=200, anchor=W)
-
+        frame = DashboardUI(frame, self.username)
         return frame
 
     def create_stresstest_frame(self):
         frame = Frame(self.body, bg='#eff5f6')
         frame.place(x=0, y=0, width=1040, height=655)
-        frame = StressTest(frame)
+        frame = StressTest(frame, self.username)
 
         return frame
     
@@ -242,13 +211,14 @@ class Dashboard:
     def create_moodtracker_frame(self):
         frame = Frame(self.body, bg='#eff5f6')
         frame.place(x=0, y=0, width=1040, height=655)
-        frame = MoodTracker(frame)
+        frame = MoodTracker(frame, self.username)
 
         return frame
 
-    def create_settings_frame(self):
+    def create_chatbot_frame(self):
         frame = Frame(self.body, bg='#eff5f6')
-        frame.place(x=0, y=0, width=1040, height=655)
+        frame.place(x=0, y=0, width=1040, height=700)
+        frame = ChatUI(frame)
 
         return frame
     
