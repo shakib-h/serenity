@@ -6,6 +6,7 @@ from PIL import ImageTk, Image
 import mysql.connector
 from frames.chatUI import ChatUI
 from frames.dashboardUI import DashboardUI
+from frames.exercise import Exercise
 from frames.moodtracker import MoodTracker
 from frames.articles import BlogPage
 from frames.stresstest import StressTest
@@ -18,9 +19,9 @@ class Dashboard:
         args = parser.parse_args()
         self.username = args.username if args.username else "User"
         self.users_data = self.get_user_data()
-        self.user_name = self.users_data['name'] if self.users_data else "User"
+        self.displayname = self.users_data['name'] if self.users_data else "User"
         self.window = window
-        self.window.title(f'{self.user_name}\'s Dashboard - Serenity')
+        self.window.title(f'{self.displayname}\'s Dashboard - Serenity')
         self.window.geometry(helper.geometry)
         self.window.resizable(0, 0)
         self.window.config(background='#eff5f6')
@@ -34,7 +35,7 @@ class Dashboard:
         self.header = Frame(self.window, bg=helper.primaryColor)
         self.header.place(x=300, y=0, width=1070, height=60)
 
-        self.headerText = Label(self.header, text=f"Hello {self.user_name}", bg=helper.primaryColor, font=("", 20, "bold"))
+        self.headerText = Label(self.header, text=f"Hello {self.displayname}", bg=helper.primaryColor, font=("", 20, "bold"))
 
         self.headerText.place(x=5, y=12)
 
@@ -74,7 +75,7 @@ class Dashboard:
         self.logo.place(x=70, y=80)
 
         # Name of brand/person
-        self.brandName = Label(self.sidebar, text=f'Hello {self.user_name}', bg='#ffffff', font=("", 15, "bold"))
+        self.brandName = Label(self.sidebar, text=f'Hello {self.displayname}', bg='#ffffff', font=("", 15, "bold"))
         self.brandName.place(x=80, y=200)
 
         # Dashboard
@@ -110,38 +111,49 @@ class Dashboard:
                                         cursor='hand2', activebackground='#ffffff', command=self.show_moodtracker)
         self.moodtracker_text.grid(row=2, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
 
+        # Exercise
+        self.exerciseImage = Image.open('assets/dashboard/icons/icons8-woman-in-lotus-position-36.png')
+        photo = ImageTk.PhotoImage(self.exerciseImage)
+        self.exercise = Label(self.sidebar, image=photo, bg='#ffffff')
+        self.exercise.image = photo
+        self.exercise.grid(row=3, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
+
+        self.exercise_text = Button(self.sidebar, text='Exercise', bg='#ffffff', font=("", 13, "bold"), bd=0,
+                                        cursor='hand2', activebackground='#ffffff', command=self.show_exercise)
+        self.exercise_text.grid(row=3, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
+
         # Articles
         self.articlesImage = Image.open('assets/dashboard/icons/icons8-newspaper-emoji-36.png')
         photo = ImageTk.PhotoImage(self.articlesImage)
         self.articles = Label(self.sidebar, image=photo, bg='#ffffff')
         self.articles.image = photo
-        self.articles.grid(row=3, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
+        self.articles.grid(row=4, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
 
         self.articles_text = Button(self.sidebar, text='Articles', bg='#ffffff', font=("", 13, "bold"), bd=0,
                                     cursor='hand2', activebackground='#ffffff', command=self.show_articles)
-        self.articles_text.grid(row=3, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
+        self.articles_text.grid(row=4, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
 
         # ChatBot
         self.chatbotImage = Image.open('assets/dashboard/icons/icons8-speech-balloon-36.png')
         photo = ImageTk.PhotoImage(self.chatbotImage)
         self.chatbot = Label(self.sidebar, image=photo, bg='#ffffff')
         self.chatbot.image = photo
-        self.chatbot.grid(row=4, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
+        self.chatbot.grid(row=5, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
 
         self.chatbot_text = Button(self.sidebar, text='ChatBot', bg='#ffffff', font=("", 13, "bold"), bd=0,
                                     cursor='hand2', activebackground='#ffffff', command=self.show_chatbot)
-        self.chatbot_text.grid(row=4, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
+        self.chatbot_text.grid(row=5, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
 
         # Exit
         self.exitImage = Image.open('assets/dashboard/icons/icons8-cross-36.png')
         photo = ImageTk.PhotoImage(self.exitImage)
         self.exit = Label(self.sidebar, image=photo, bg='#ffffff')
         self.exit.image = photo
-        self.exit.grid(row=5, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
+        self.exit.grid(row=6, column=0, pady=(10, 0), padx=(35, 0), sticky="w")
 
         self.exit_text = Button(self.sidebar, text='Exit', bg='#ffffff', font=("", 13, "bold"), bd=0,
                                 cursor='hand2', activebackground='#ffffff', command=self.Exit)
-        self.exit_text.grid(row=5, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
+        self.exit_text.grid(row=6, column=1, pady=(10, 0), padx=(0, 25), sticky="w")
 
 
 
@@ -205,7 +217,7 @@ class Dashboard:
     def create_exercise_frame(self):
         frame = Frame(self.body, bg='#eff5f6')
         frame.place(x=0, y=0, width=1040, height=655)
-
+        frame = Exercise(frame, self.displayname)
         return frame
 
     def create_moodtracker_frame(self):
@@ -218,7 +230,7 @@ class Dashboard:
     def create_chatbot_frame(self):
         frame = Frame(self.body, bg='#eff5f6')
         frame.place(x=0, y=0, width=1040, height=700)
-        frame = ChatUI(frame)
+        frame = ChatUI(frame, self.displayname)
 
         return frame
     

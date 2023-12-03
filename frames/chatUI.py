@@ -13,9 +13,9 @@ xi = 20
 yi = 20
 
 class ChatUI:
-    def __init__(self, parent_frame):
+    def __init__(self, parent_frame, displayname):
         self.parent_frames = parent_frame
-        self.mood_value = 0
+        self.displayname = displayname
         image_path = os.path.join(helper.parent_directory, "serenity", "assets", "sendButton.png")
         self.send_image = ImageTk.PhotoImage(file=image_path)
 
@@ -78,13 +78,13 @@ class ChatUI:
                 top_p=1,
                 frequency_penalty=0,
                 presence_penalty=0.6,
-                stop=[" You:", " Serenity:"]
+                stop=[f" {self.displayname}:", " Serenity:"]
             )
 
             bot_response = response.choices[0].text
 
             # Update the user's message text
-            self.user_message.config(text="You: " + user_input)
+            self.user_message.config(text=f"{self.displayname}: " + user_input)
 
             # Update the bot's response text with word wrapping
             self.bot_response_label.config(text="Serenity: ", anchor="w", wraplength=900)

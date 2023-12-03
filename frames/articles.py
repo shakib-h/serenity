@@ -19,8 +19,7 @@ blogs = [
 class BlogPage:
     def __init__(self, parent_frame):
         self.parent_frame = parent_frame
-        self.mood_value = 0
-
+        
         # Create a custom style for rounded rectangular labels
         style = ttk.Style()
         style.configure("RoundedRect.TLabel", borderwidth=1, relief="solid", padding=10, background="white",
