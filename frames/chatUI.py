@@ -72,7 +72,7 @@ class ChatUI:
             # Send the prompt to the ChatGPT API (GPT-3.5-turbo engine)
             response = client.completions.create(
                 model="gpt-3.5-turbo-instruct",
-                prompt="The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nYou: Hello, who are you?\nSerenity: I am an AI created by OpenAI. How can I help you today?\nYo: I need help with mental health\nSerenity:",
+                prompt=f"The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nYou: {user_input}\nSerenity: I am an AI created by OpenAI. How can I help you today?\nYo: I need help with mental health\nSerenity:",
                 temperature=0.9,
                 max_tokens=150,
                 top_p=1,

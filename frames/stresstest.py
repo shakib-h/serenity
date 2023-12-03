@@ -88,11 +88,13 @@ class StressTest:
         for i, response in enumerate(self.user_input):
             stress_level += stress_mapping[str(response)] * (weights[i] / 100)
 
-        question_bg = Frame(height=420, width=580, bg="#a6de9b", master=self.parent_frame)
+        question_bg = Frame(height=420, width=580, bg="#eff5f6", master=self.parent_frame)
         question_bg.pack()
         stress_result += str(stress_level)
         stress = tk.Label(question_bg, text=stress_result, bg='#eff5f6', fg='#000000', font=('Arial', 21))
         stress.pack()
+        stress_help = tk.Label(question_bg, text="Please move over to the chatbot for further assistance.", bg='#eff5f6', fg='#000000', font=('Arial', 21))
+        stress_help.pack()
 
         # Save stress result to the database
         base = mysql.connector.connect(**helper.db_config)
