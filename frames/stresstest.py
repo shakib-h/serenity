@@ -10,7 +10,6 @@ class StressTest:
         self.parent_frame = parent_frame
         self.username = username
 
-        # Check if tables exist, create if needed
         self.check_and_create_tables()
 
         self.questions = [
@@ -48,7 +47,6 @@ class StressTest:
         base = mysql.connector.connect(**helper.db_config)
         cur = base.cursor()
 
-        # Check if stress_results table exists, create if needed
         cur.execute("SHOW TABLES LIKE 'stress_results'")
         result = cur.fetchone()
         if not result:
@@ -96,7 +94,6 @@ class StressTest:
         stress_help = tk.Label(question_bg, text="Please move over to the chatbot for further assistance.", bg='#eff5f6', fg='#000000', font=('Arial', 21))
         stress_help.pack()
 
-        # Save stress result to the database
         base = mysql.connector.connect(**helper.db_config)
         cur = base.cursor()
         current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')

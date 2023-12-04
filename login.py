@@ -128,11 +128,9 @@ class Login:
         self.loginw.protocol('WM_DELETE_WINDOW', self.__login_del__)
         self.loginw.config(bg=helper.accentColor)
         
-        # Load the background image
         background_image = Image.open("assets/background_image.jpg")
         self.background_photo = ImageTk.PhotoImage(background_image)
 
-        # Create a canvas to display the background image
         self.background_canvas = Canvas(self.loginw, width=helper.width, height=helper.height)
         self.background_canvas.create_image(0, 0, image=self.background_photo, anchor="nw")
         self.background_canvas.pack()
@@ -149,7 +147,7 @@ class Login:
     def __login_del__(self):
         if messagebox.askyesno("Quit", " Leave App?") == True:
             self.loginw.destroy()
-            exit(0)  # FORCE SYSTEM TO EXIT
+            exit(0)
 
     def logintable(self):
         self.base = mysql.connector.connect(**helper.db_config)

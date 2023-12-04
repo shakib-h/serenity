@@ -66,10 +66,10 @@ class ChatUI:
         user_input = self.user_entry.get()
 
         if user_input:
-            # Include a prompt indicating that the app is for mental health support
+            
             prompt = "This app is for mental health support. You are now chatting with Serenity, a mental health support bot. User: " + user_input
 
-            # Send the prompt to the ChatGPT API (GPT-3.5-turbo engine)
+
             response = client.completions.create(
                 model="gpt-3.5-turbo-instruct",
                 prompt=f"The following is a conversation with an AI assistant. The assistant is helpful, creative, clever, and very friendly.\n\nYou: {user_input}\nSerenity: I am an AI created by OpenAI. How can I help you today?\nYo: I need help with mental health\nSerenity:",
@@ -83,20 +83,19 @@ class ChatUI:
 
             bot_response = response.choices[0].text
 
-            # Update the user's message text
+
             self.user_message.config(text=f"{self.displayname}: " + user_input)
 
-            # Update the bot's response text with word wrapping
+
             self.bot_response_label.config(text="Serenity: ", anchor="w", wraplength=900)
             self.bot_response_text.config(text=bot_response, anchor="w", wraplength=900)
 
-            # Update yi based on the total height of user's and bot's messages
-            # yi += 50  # Assuming a fixed height for both user and bot messages
+
         else:
-            # Display a message if there's no user input
+            
             self.bot_response_label.config(text="Serenity: Enter a message", anchor="w")
 
-        # Reset user entry
+
         self.user_entry.delete(0, "end")
 
     def on_entry(self, e):

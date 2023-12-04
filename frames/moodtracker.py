@@ -37,8 +37,6 @@ class MoodTracker:
         self.mood_label.place(x=380, y=400, anchor='center')
         self.mood_value_label.place(x=600, y=400, anchor='center')
         self.mood_label_help.place(x=600, y=500, anchor='center')
-        # self.save_mood_button.place(x=600, y=500, anchor='center')
-        # self.update_mood_value_label()
 
     def happy_mood(self):
         self.mood_value = "Happy"

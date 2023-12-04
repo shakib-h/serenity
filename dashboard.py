@@ -29,7 +29,7 @@ class Dashboard:
         self.window.iconphoto(True, icon)
         self.window.protocol('WM_DELETE_WINDOW', self.Exit)
 
-        self.current_frame = None  # To keep track of the current frame being displayed
+        self.current_frame = None
 
         # HEADER
         self.header = Frame(self.window, bg=helper.primaryColor)
@@ -53,13 +53,12 @@ class Dashboard:
         self.body = Frame(self.window, bg='#eff5f6')
         self.body.place(x=300, y=60, width=1066, height=708)
 
-        # Initialize with the Dashboard frame
+        # Initializing dashboard frame
         self.show_dashboard()
 
     def get_user_data(self):
-        # Fetch the user's data from the database based on the username
         base = mysql.connector.connect(**helper.db_config)
-        cur = base.cursor(dictionary=True)  # Use dictionary cursor for easier data access
+        cur = base.cursor(dictionary=True) 
         cur.execute("SELECT * FROM users WHERE username = %s", (self.username,))
         result = cur.fetchone()
         base.close()
@@ -74,7 +73,7 @@ class Dashboard:
         self.logo.image = photo
         self.logo.place(x=70, y=80)
 
-        # Name of brand/person
+        # Name Person
         self.brandName = Label(self.sidebar, text=f'Hello {self.displayname}', bg='#ffffff', font=("", 15, "bold"))
         self.brandName.place(x=80, y=200)
 

@@ -18,13 +18,11 @@ new_blogs = [
 class BlogPage:
     def __init__(self, new_parent_frame):
         self.new_parent_frame = new_parent_frame
-        
-        # Create a custom style for rounded rectangular labels
+    
         new_style = ttk.Style()
         new_style.configure("RoundedRect.TLabel", borderwidth=1, relief="solid", padding=10, background="white",
                         bordercolor="gray", borderradius=10)
 
-        # Create a canvas with a vertical scrollbar
         self.new_canvas = tk.Canvas(self.new_parent_frame, borderwidth=0)
         vsb = tk.Scrollbar(self.new_parent_frame, orient="vertical", command=self.new_canvas.yview)
         self.new_canvas.configure(yscrollcommand=vsb.set)
@@ -37,24 +35,21 @@ class BlogPage:
 
         self.new_frame.bind("<Configure>", lambda event, canvas=self.new_canvas: canvas.configure(scrollregion=canvas.bbox("all")))
 
-        # Function to handle mouse wheel scrolling
         def on_mousewheel(event):
             self.new_canvas.yview_scroll(-1 * (event.delta // 120), "units")
 
-        # Bind mouse wheel scrolling to the canvas
         self.new_canvas.bind_all("<MouseWheel>", on_mousewheel)
 
-        # Calculate the width of the link boxes based on the window size
-        new_box_width = 470  # Half the window width
-        new_box_height = 300  # You can adjust this value as needed
+        new_box_width = 470
+        new_box_height = 300
 
-        # Create two frames, one for each column
+
         self.new_frame1 = ttk.Frame(self.new_frame)
         self.new_frame2 = ttk.Frame(self.new_frame)
         self.new_frame1.grid(row=0, column=0, sticky="nsew")
         self.new_frame2.grid(row=0, column=1, sticky="nsew")
 
-        # Create labels for each blog entry with images resized to the calculated box size
+
         for i, new_blog in enumerate(new_blogs):
             new_title = new_blog["new_title"]
             new_link = new_blog["new_link"]
@@ -78,12 +73,11 @@ class BlogPage:
             new_label.image = new_placeholder_photo
             new_label.grid(row=i // 2, padx=10, pady=10, sticky="nsew")
 
-            # Load the actual image after a delay
             self.load_image_after_delay(new_label, new_image_url, new_box_width, new_box_height)
 
             new_label.bind("<Button-1>", lambda event, new_link=new_link: self.open_link(new_link))
 
-        # Configure row and column weights for grid resizing
+
         self.new_frame.grid_rowconfigure(0, weight=1)
         self.new_frame.grid_columnconfigure(0, weight=1)
         self.new_frame.grid_columnconfigure(1, weight=1)
@@ -92,22 +86,20 @@ class BlogPage:
         webbrowser.open(new_link)
 
     def load_image_after_delay(self, new_label, new_image_url, new_width, new_height):
-        # Define a function to load the image and update the label
         def load_image_and_update_label():
             try:
                 response = requests.get(new_image_url)
                 img = Image.open(BytesIO(response.content))
-                img = img.resize((new_width, new_height), Image.LANCZOS)  # Resize the image
+                img = img.resize((new_width, new_height), Image.LANCZOS)
                 new_photo = ImageTk.PhotoImage(img)
 
-                # Update the label with the loaded image
+
                 new_label.config(image=new_photo)
                 new_label.image = new_photo
 
             except Exception as e:
                 print(f"Error loading image: {e}")
 
-        # Schedule the image loading function after a delay using threading
         thread = threading.Thread(target=load_image_and_update_label)
         thread.start()
 
