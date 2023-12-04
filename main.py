@@ -1,17 +1,19 @@
+import subprocess
 from ttkbootstrap import *
 from tkinter import messagebox
-from login import Login
 from splash import Splash
 
 # MAIN WINDOW
-class Main(Login):
+class Main():
     def __init__(self):
-        Splash()
-        Login.__init__(self)
-        self.loginw.mainloop()
+        self.show_splash()
+        self.run_login()
 
-if __name__ == '__main__':
-    app = Main()
-    app.base.commit()
-    app.mainw.mainloop()
-	
+    def show_splash(self):
+        Splash()
+
+    def run_login(self):
+        subprocess.run(["python", "login.py"])
+
+if __name__ == "__main__":
+    main_window = Main()

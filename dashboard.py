@@ -215,7 +215,7 @@ class Dashboard:
 
     def create_exercise_frame(self):
         frame = Frame(self.body, bg='#eff5f6')
-        frame.place(x=0, y=0, width=1040, height=655)
+        frame.place(x=0, y=0, width=1066, height=708)
         frame = Exercise(frame, self.displayname)
         return frame
 

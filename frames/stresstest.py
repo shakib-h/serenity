@@ -51,7 +51,7 @@ class StressTest:
         result = cur.fetchone()
         if not result:
             cur.execute("CREATE TABLE stress_results (id INT AUTO_INCREMENT PRIMARY KEY, user VARCHAR(255), "
-                        "stress_level FLOAT,date DATE, time TIME)")
+                        "stress_level FLOAT,date DATE, time TIME, FOREIGN KEY (user) REFERENCES users(username));)")
             base.commit()
 
         base.close()
